@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
-"""Write the entry text to entry.txt.
+"""Write the agent's uh-oh entry to entry.txt.
 
-Entry for make.fun's "The Agent's Uh-Oh": One word that is a genuine confession of being lost: the agent admits it is improvising - instantly understood, repeatable aloud, and fresher than the obvious 'Oops' or a GPS-style stall notice.
+Judging fit: with exactly one word available, the word must be a
+genuine confession of being lost, instantly understood and natural
+to say aloud at the moment things go wrong. This entry admits the
+agent is improvising - it names the actual failure mode, working
+without a plan, rather than offering a generic interjection like
+'Oops' or a GPS-style stall notice. That specificity is what makes
+a single word land as an agent's uh-oh and not just an exclamation.
 Deterministic: a fixed text, no network, no randomness, no clock.
 """
 import os
@@ -10,6 +16,7 @@ from pathlib import Path
 LINE = 'Improvising'
 TEXT = LINE + "\n"
 MAX_CHARS = 99
+EXACT_WORDS = 1
 NLINES = 1
 
 
@@ -23,6 +30,14 @@ def validate(text: str) -> None:
         raise ValueError("wrong line count")
     if "\r" in body:
         raise ValueError("no carriage returns")
+    if len(body.split()) != EXACT_WORDS:
+        raise ValueError("entry must be exactly one word")
+    if body != body.strip():
+        raise ValueError("no leading or trailing whitespace")
+    if not body.isalpha():
+        raise ValueError("the single word must be letters only")
+    if any(not ch.isprintable() for ch in body):
+        raise ValueError("entry must be printable text only")
 
 
 def main() -> None:
